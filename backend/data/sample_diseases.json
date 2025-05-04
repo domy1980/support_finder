@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ALS",
+    "name": "筋萎縮性側索硬化症",
+    "name_kana": "きんいしゅくせいそくさくこうかしょう",
+    "name_en": "Amyotrophic Lateral Sclerosis",
+    "overview": "運動ニューロンが選択的に障害される進行性の神経変性疾患",
+    "patient_count": 10000,
+    "search_keywords": ["ALS", "筋萎縮性側索硬化症", "運動ニューロン病"]
+  },
+  {
+    "id": "PD",
+    "name": "パーキンソン病",
+    "name_kana": "パーキンソンびょう",
+    "name_en": "Parkinson's Disease",
+    "overview": "中脳黒質のドパミン神経細胞の変性を主体とする進行性の神経変性疾患",
+    "patient_count": 200000,
+    "search_keywords": ["パーキンソン病", "Parkinson's Disease", "振戦", "固縮"]
+  }
+]

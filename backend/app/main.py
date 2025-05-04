@@ -1,7 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api.v1 import llm
+from app.api.v1 import llm, diseases, search, nando
+from app.database import engine
+from app.models import disease, organization
+
+# データベーステーブルの作成
+disease.Base.metadata.create_all(bind=engine)
+try:
+    organization.Base.metadata.create_all(bind=engine)
+except:
+    pass  # organizationモデルがまだない場合はスキップ
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -19,6 +28,9 @@ app.add_middleware(
 
 # APIルーターの登録
 app.include_router(llm.router, prefix=f"{settings.API_V1_STR}/llm", tags=["llm"])
+app.include_router(diseases.router, prefix=f"{settings.API_V1_STR}/diseases", tags=["diseases"])
+app.include_router(search.router, prefix=f"{settings.API_V1_STR}/search", tags=["search"])
+app.include_router(nando.router, prefix=f"{settings.API_V1_STR}/nando", tags=["nando"])
 
 @app.get("/")
 async def root():
