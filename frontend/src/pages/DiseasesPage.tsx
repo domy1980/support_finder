@@ -1,3 +1,5 @@
+////frontend/src/pages/DiseasePage.tsx
+
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Typography, Box, List, ListItem, ListItemText, 

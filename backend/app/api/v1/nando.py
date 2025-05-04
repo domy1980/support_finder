@@ -15,7 +15,7 @@ async def import_nando_data(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    """NANDOデータファイルをインポート"""
+    """NANDOデータファイルまたはカスタム疾患データをインポート"""
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="Excel file required")
     
@@ -26,6 +26,32 @@ async def import_nando_data(
             shutil.copyfileobj(file.file, buffer)
         
         # インポート実行
+        import_service = NandoImportService()
+        result = import_service.import_nando_data(db, str(temp_file))
+        
+        return result
+    
+    finally:
+        # 一時ファイルを削除
+        if temp_file.exists():
+            os.remove(temp_file)
+
+@router.post("/import/custom")
+async def import_custom_diseases(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    """NANDO形式のカスタム疾患データをインポート"""
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="Excel file required")
+    
+    # 一時ファイルとして保存
+    temp_file = Path(f"temp_custom_{file.filename}")
+    try:
+        with open(temp_file, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # インポート実行（同じ形式なので同じサービスを使用）
         import_service = NandoImportService()
         result = import_service.import_nando_data(db, str(temp_file))
         

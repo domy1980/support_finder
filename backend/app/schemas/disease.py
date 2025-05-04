@@ -16,6 +16,7 @@ class DiseaseBase(BaseModel):
     characteristics: Optional[str] = None
     patient_count: Optional[int] = None
     search_keywords: Optional[List[str]] = None
+    is_searchable: Optional[bool] = True  # 追加
 
 class DiseaseCreate(DiseaseBase):
     id: str
@@ -33,6 +34,11 @@ class DiseaseUpdate(BaseModel):
     characteristics: Optional[str] = None
     patient_count: Optional[int] = None
     search_keywords: Optional[List[str]] = None
+    is_searchable: Optional[bool] = None  # 追加
+
+class DiseaseSearchableUpdate(BaseModel):
+    disease_id: str
+    is_searchable: bool
 
 class CustomKeywordCreate(BaseModel):
     keyword: str

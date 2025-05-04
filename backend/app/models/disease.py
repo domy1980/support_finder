@@ -20,6 +20,7 @@ class Disease(Base):
     parent_disease_id = Column(String)
     is_designated_intractable = Column(Boolean, default=False)
     is_chronic_childhood = Column(Boolean, default=False)
+    is_searchable = Column(Boolean, default=True)  # 新しく追加
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

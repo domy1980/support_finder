@@ -1,5 +1,10 @@
 import axios from 'axios';
-import { Disease, Organization, SearchSettings, SearchResult } from '../types';
+import { Disease } from '../types';
+
+// インポートはTypeScriptの型として使用されるものだけに限定
+type Organization = any;
+type SearchSettings = any;
+type SearchResult = any;
 
 const api = axios.create({
   baseURL: 'http://localhost:8000/api/v1',
@@ -18,6 +23,21 @@ export const diseaseApi = {
   search: (query: string) => api.get<Disease[]>(`/diseases/search/${query}`),
   getSearchable: () => api.get<Disease[]>('/diseases/searchable'),
   getHierarchyStats: () => api.get('/diseases/hierarchy/stats'),
+  
+  // 検索対象管理用
+  batchUpdateSearchable: (updates: Array<{ disease_id: string; is_searchable: boolean }>) =>
+    api.post('/diseases/batch-update-searchable', updates),
+  updateSearchable: (diseaseId: string, is_searchable: boolean) =>
+    api.patch(`/diseases/${diseaseId}/searchable`, { is_searchable }),
+  exportSearchable: () =>
+    api.get('/diseases/searchable/export', { responseType: 'blob' }),
+  importSearchableSettings: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/diseases/searchable/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
   
   // キーワード関連
   addKeyword: (diseaseId: string, keywordData: { keyword: string; keyword_type: string; added_by: string }) => 
@@ -52,6 +72,13 @@ export const nandoApi = {
     const formData = new FormData();
     formData.append('file', file);
     return api.post('/nando/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  importCustomDiseases: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/nando/import/custom', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
   },

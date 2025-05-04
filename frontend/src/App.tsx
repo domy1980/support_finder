@@ -1,61 +1,51 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
 import HomePage from './pages/HomePage';
-import LLMTestPage from './pages/LLMTestPage';
 import DiseasesPage from './pages/DiseasesPage';
 import DiseaseDetailPage from './pages/DiseaseDetailPage';
-import NandoImportPage from './pages/NandoImportPage';
 import SearchOrganizationsPage from './pages/SearchOrganizationsPage';
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
+import NandoImportPage from './pages/NandoImportPage';
+import LLMTestPage from './pages/LLMTestPage';
+import DiseaseManagementPage from './pages/DiseaseManagementPage';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Disease Support Finder
-            </Typography>
-            <Button color="inherit" component={Link} to="/">
-              ホーム
-            </Button>
-            <Button color="inherit" component={Link} to="/diseases">
-              疾患一覧
-            </Button>
-            <Button color="inherit" component={Link} to="/nando">
-              NANDOデータ
-            </Button>
-            <Button color="inherit" component={Link} to="/llm-test">
-              LLMテスト
-            </Button>
-          </Toolbar>
-        </AppBar>
-        
+    <Router>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            難病・希少疾患支援団体検索システム
+          </Typography>
+          <Button color="inherit" component={Link} to="/">
+            ホーム
+          </Button>
+          <Button color="inherit" component={Link} to="/diseases">
+            疾患一覧
+          </Button>
+          <Button color="inherit" component={Link} to="/diseases/manage">
+            検索対象管理
+          </Button>
+          <Button color="inherit" component={Link} to="/nando/import">
+            NANDOインポート
+          </Button>
+          <Button color="inherit" component={Link} to="/llm/test">
+            LLMテスト
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Container>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/diseases" element={<DiseasesPage />} />
+          <Route path="/diseases/manage" element={<DiseaseManagementPage />} />
           <Route path="/diseases/:diseaseId" element={<DiseaseDetailPage />} />
           <Route path="/search/:diseaseId" element={<SearchOrganizationsPage />} />
-          <Route path="/nando" element={<NandoImportPage />} />
-          <Route path="/llm-test" element={<LLMTestPage />} />
+          <Route path="/nando/import" element={<NandoImportPage />} />
+          <Route path="/llm/test" element={<LLMTestPage />} />
         </Routes>
-      </Router>
-    </ThemeProvider>
+      </Container>
+    </Router>
   );
 }
 
