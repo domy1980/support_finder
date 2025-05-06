@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     LM_STUDIO_BASE_URL: str = "http://localhost:1234/v1"
     LM_STUDIO_MODEL: str = "qwen2.5-7b-instruct-q4_k_m"
     
+    # Google Custom Search設定
+    GOOGLE_API_KEY: str = ""
+    GOOGLE_CSE_ID: str = ""  # Custom Search Engine ID
+    GOOGLE_API_MAX_RESULTS: int = 10
+    GOOGLE_API_RATE_LIMIT: int = 100  # 1日あたりの最大リクエスト数
+    
     # スクレイピング設定
     USER_AGENT: str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
     REQUEST_TIMEOUT: int = 30

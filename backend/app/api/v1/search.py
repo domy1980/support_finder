@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict, Any
 from app.database import get_db
-from app.services.search_service import SearchService
+from app.services.search_service_google import GoogleSearchService
 
 router = APIRouter()
-search_service = SearchService()
+search_service = GoogleSearchService()
 
 @router.post("/disease/{disease_id}")
 async def search_organizations_for_disease(
