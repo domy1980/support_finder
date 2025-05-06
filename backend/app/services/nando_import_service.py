@@ -5,6 +5,9 @@ from app.models.disease import Disease
 from app.schemas.disease import DiseaseCreate
 import re
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 class NandoImportService:
     def __init__(self):
@@ -14,17 +17,58 @@ class NandoImportService:
         """NANDOデータファイルをインポート"""
         try:
             # Excelファイルを読み込む
-            df = pd.read_excel(file_path, header=0)
-            
-            # 必要なカラムが存在するか確認
-            required_columns = ['NANDO', 'label']
-            missing_columns = [col for col in required_columns if col not in df.columns]
-            if missing_columns:
+            logger.info(f"Importing NANDO data from {file_path}")
+            try:
+                df = pd.read_excel(file_path, header=0)
+            except Exception as e:
+                logger.error(f"Excel読み込みエラー: {str(e)}")
                 return {
                     "status": "error",
-                    "message": f"必要なカラムが見つかりません: {', '.join(missing_columns)}",
+                    "message": f"Excel読み込みエラー: {str(e)}",
                     "imported": 0
                 }
+            
+            # データフレームの情報をログに出力
+            logger.info(f"DataFrame columns: {df.columns.tolist()}")
+            logger.info(f"DataFrame shape: {df.shape}")
+            logger.info(f"First few rows: {df.head().to_dict()}")
+            
+            # 必要なカラムが存在するか確認
+            # 柔軟に対応するため、大文字小文字を区別せずに確認
+            columns_lower = [col.lower() for col in df.columns]
+            
+            nando_col = None
+            label_col = None
+            
+            # NANDO列を探す
+            for col in df.columns:
+                if col.lower() == 'nando' or 'nando' in col.lower():
+                    nando_col = col
+                    break
+            
+            # label列を探す
+            for col in df.columns:
+                if col.lower() == 'label' or 'label' in col.lower() or '名称' in col or '疾患名' in col:
+                    label_col = col
+                    break
+            
+            if not nando_col:
+                logger.error("NANDO列が見つかりません")
+                return {
+                    "status": "error",
+                    "message": "NANDO列が見つかりません。列名に'NANDO'を含む列が必要です。",
+                    "imported": 0
+                }
+            
+            if not label_col:
+                logger.error("疾患名列が見つかりません")
+                return {
+                    "status": "error",
+                    "message": "疾患名列が見つかりません。列名に'label'や'名称'、'疾患名'を含む列が必要です。",
+                    "imported": 0
+                }
+            
+            logger.info(f"Using columns: NANDO={nando_col}, label={label_col}")
             
             imported_count = 0
             skipped_count = 0
@@ -33,10 +77,11 @@ class NandoImportService:
             # データをインポート
             for index, row in df.iterrows():
                 try:
-                    nando_id = str(row['NANDO']).strip() if pd.notna(row['NANDO']) else None
-                    disease_name = str(row['label']).strip() if pd.notna(row['label']) else None
+                    nando_id = str(row[nando_col]).strip() if pd.notna(row[nando_col]) else None
+                    disease_name = str(row[label_col]).strip() if pd.notna(row[label_col]) else None
                     
                     if not disease_name:
+                        logger.warning(f"行 {index + 2}: 疾患名が空のためスキップします")
                         skipped_count += 1
                         continue
                     
@@ -56,11 +101,13 @@ class NandoImportService:
                     
                     if existing_disease:
                         # 既存のデータを更新
+                        logger.info(f"行 {index + 2}: 既存データを更新 - {disease_name}")
                         existing_disease.name = disease_name
                         if is_english:
                             existing_disease.name_en = disease_name
                     else:
                         # 新規データを作成
+                        logger.info(f"行 {index + 2}: 新規データを作成 - {disease_name}")
                         db_disease = Disease(
                             id=disease_id,
                             nando_id=nando_id,
@@ -74,14 +121,17 @@ class NandoImportService:
                         imported_count += 1
                     
                 except Exception as e:
+                    logger.error(f"行 {index + 2}: エラー {str(e)}")
                     errors.append(f"行 {index + 2}: {str(e)}")
                     continue
             
             # コミット
             try:
                 db.commit()
+                logger.info(f"インポート成功: {imported_count}件のデータをインポートしました。{skipped_count}件スキップしました。")
             except Exception as e:
                 db.rollback()
+                logger.error(f"データベースエラー: {str(e)}")
                 return {
                     "status": "error",
                     "message": f"データベースエラー: {str(e)}",
@@ -97,9 +147,10 @@ class NandoImportService:
             }
             
         except Exception as e:
+            logger.error(f"予期せぬエラー: {str(e)}")
             return {
                 "status": "error",
-                "message": f"ファイル読み込みエラー: {str(e)}",
+                "message": f"予期せぬエラー: {str(e)}",
                 "imported": 0
             }
     
