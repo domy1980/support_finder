@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     LM_STUDIO_MODEL: str = "qwen2.5-7b-instruct-q4_k_m"
     
     # Google Custom Search設定
-    GOOGLE_API_KEY: str = ""
-    GOOGLE_CSE_ID: str = ""  # Custom Search Engine ID
+    GOOGLE_API_KEY: str = "AIzaSyA1uVr9Rgu973gMxA1guk8QyvqKw2oEQTU"
+    GOOGLE_CSE_ID: str = "727e4904427e9457a"  # Custom Search Engine ID
     GOOGLE_API_MAX_RESULTS: int = 10
     GOOGLE_API_RATE_LIMIT: int = 100  # 1日あたりの最大リクエスト数
     
